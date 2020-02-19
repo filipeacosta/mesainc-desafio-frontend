@@ -1,0 +1,23 @@
+@import '../../../node_modules/bootstrap/scss/bootstrap.scss';
+@import '../../../node_modules/@fortawesome/fontawesome-free/css/all.css';
+@import 'https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css';
+
+.card{
+    position: relative;
+    max-width: 45rem;
+    margin: auto;
+}
+
+.logout{
+    transition: .3s;
+    position: absolute;
+    top:1rem;
+    right:1rem;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    i{
+        margin-left: .6rem;
+        font-size: 1.5rem;
+    }
+}
