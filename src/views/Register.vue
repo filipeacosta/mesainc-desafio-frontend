@@ -48,9 +48,8 @@ export default {
         password: this.form.password
       })
         .then(function (response) {
-          console.log(response)
           localStorage.setItem('auth-token', response.data.token)
-          router.push({ path: '/' })
+          router.push({ path: '/profile' })
         })
         .catch(function (error) {
           console.log('catch')

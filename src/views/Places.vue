@@ -26,20 +26,21 @@
                             </div>
                         </div>
                     </div>
-                    <button class="ui button" @click="findCloseBuyButtonPressed">Find CloseBuy</button>
+                    <button class="ui button" @click="findCloseBuyButtonPressed">Buscar</button>
 
                 </div>
-                <div class="ui segment"  style="max-height:500px;overflow:scroll">
-                    <div class="ui divided items">
-                        <div class="item" v-for="place in places" :key="place.id">
-                            <div class="content">
-                                <div class="header">{{place.name}}</div>
-                                <div class="meta">{{place.vicinity}}</div>
-                            </div>
+            </form>   
+
+            <div class="ui segment"  style="max-height:500px;overflow:scroll">
+                <div class="ui divided items">
+                    <div class="item" v-for="place in places" :key="place.id">
+                        <div class="content">
+                            <div class="header">{{place.name}}</div>
+                            <div class="meta">{{place.vicinity}}</div>
                         </div>
                     </div>
                 </div>
-            </form>        
+            </div>     
         </div>
         <div class="col-md-8" ref="map"></div>
     </div>
@@ -81,11 +82,11 @@
                 this.axios
                     .get(URL)
                     .then(response => {
-                    this.places = response.data.results;
-                    this.addLocationsToGoogleMaps();
+                        this.places = response.data.results;
+                        this.addLocationsToGoogleMaps();
                     })
                     .catch(error => {
-                    console.log(error.message);
+                        console.log(error.message);
                     });
             },
             addLocationsToGoogleMaps() {
@@ -94,15 +95,21 @@
                     center: new google.maps.LatLng(this.lat, this.lng),
                     mapTypeId: google.maps.MapTypeId.ROADMAP
                 });
+                
+                var infowindow = new google.maps.Infowindow();
+
                 this.places.forEach((place) => {
-                const lat = place.geometry.location.lat;
-                const lng = place.geometry.location.lng;
-                let marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(lat, lng),
-                    map: map
-                });
+                    const lat = place.geometry.location.lat;
+                    const lng = place.geometry.location.lng;
+                
+                    let marker = new  google.maps.Marker({
+                        position: new google.maps.LatLng(lat, lng),
+                        map: map
+                    }); 
+
                     google.maps.event.addListener(marker, "click", () => {
                         infowindow.setContent(`<div class="ui header">${place.name}</div><p>${place.vicinity}</p>`);
+                        
                         infowindow.open(map, marker);
                     });
                 });

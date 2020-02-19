@@ -1,62 +1,72 @@
 <template>
-    <div class="page">  
-      <div class="container">
-          <div class="py-5 text-center">
-              <img class="d-block mx-auto mb-4" src="../assets/logo.svg" alt="" width="72" height="72">
-              <h2>Editar usuário</h2>
-          </div>
+    <div class="page">
+        <div class="container">
+            <div class="py-5 text-center">
+                <img class="d-block mx-auto mb-4" src="../assets/logo.svg" alt="" width="72" height="72">
+                <h2>Editar usuário</h2>
+            </div>
 
-          <div class="row">
+            <div class="row">
 
-              <div class="col-md-5 mx-auto">
+                <div class="col-md-5 mx-auto">
 
-                  <form class="needs-validation" novalidate @submit.prevent="submit()">
-                      <div class="row">
-                          <div class="col-md-6 mb-3">
-                              <label for="email">E-mail</label>
-                              <input type="email" class="form-control" id="email" placeholder="seuemail@examplo.com" v-model="form.email">
-                          </div>
-                          <div class="col-md-6 mb-3">
-                              <label for="password">Senha</label>
-                              <input type="password" class="form-control" id="password" placeholder="Senha" v-model="form.password">
-                          </div>
-                      </div>
+                    <form class="needs-validation" novalidate @submit.prevent="submit()">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email">E-mail</label>
+                                <input type="email" class="form-control" id="email" v-model="form.email">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="password">Senha</label>
+                                <input type="password" class="form-control" id="password" v-model="form.password">
+                            </div>
+                        </div>
 
-                      <button class="btn btn-primary float-right" type="submit">Cadastrar</button>
-                  </form>
-              </div>
-          </div>
-      </div>
+                        <button class="btn btn-primary float-right" type="submit">Cadastrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
-export default {
-  name: 'Register',
-  data: () => ({
-    form: {
-      email: '',
-      password: ''
+    export default {
+        name: 'Register',
+        data: () => ({
+            form: {
+                email: '',
+                password: ''
+            }
+        }),
+        mounted() {
+            this.axios
+            .get('https://reqres.in/api/users/2')
+            .then(response => {
+                this.form.email = response.data.data.email
+            })
+            .catch(error => {
+                this.errored = true
+            })
+        },
+        methods: {
+            submit() {
+                console.log(this.form)
+                const router = this.$router
+                this.axios.put('https://reqres.in/api/users/2', {
+                    email: this.form.email,
+                    password: this.form.password
+                })
+                .then(function (response) {
+                    localStorage.setItem('auth-token', response.data.token)
+                    router.push({
+                        path: '/'
+                    })
+                })
+                .catch(function (error) {
+
+                })
+            }
+        }
     }
-  }),
-  methods: {
-    submit () {
-      console.log(this.form)
-      const router = this.$router
-      this.axios.post('https://reqres.in/api/register', {
-        email: this.form.email,
-        password: this.form.password
-      })
-        .then(function (response) {
-          console.log(response)
-          localStorage.setItem('auth-token', response.data.token)
-          router.push({ path: '/' })
-        })
-        .catch(function (error) {
-          console.log('catch')
-          console.log(error)
-        })
-    }
-  }
-}
 </script>
