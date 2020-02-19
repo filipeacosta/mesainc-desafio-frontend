@@ -1,123 +1,86 @@
 <template>
-    <div class="row">
-        <div class="col-md-4">
-            <form class="ui segment large form">
-                <div class="ui segment">
-                    <div class="field">
-                        <div class="ui right icon input large">
-                            <input type="text" placeholder="Enter your address" v-model="coordinates" />
-                            <i class="dot circle link icon" @click="locatorButtonPressed"></i>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="two fields">
-                            <div class="field">
-                                <select v-model="type">
-                                    <option value="restaurant">Restaurant</option>
-                                </select>
-                            </div>
-                            <div class="field">
-                                <select v-model="radius">
-                                    <option value="5">5 KM</option>
-                                    <option value="10">10 KM</option>
-                                    <option value="15">15 KM</option>
-                                    <option value="20">20 KM</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="ui button" @click="findCloseBuyButtonPressed">Buscar</button>
-
-                </div>
-            </form>   
-
-            <div class="ui segment"  style="max-height:500px;overflow:scroll">
-                <div class="ui divided items">
-                    <div class="item" v-for="place in places" :key="place.id">
-                        <div class="content">
-                            <div class="header">{{place.name}}</div>
-                            <div class="meta">{{place.vicinity}}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>     
+    <div class="page">
+        <div id="nav" class="menu">
+            <router-link to="/profile">Perfil</router-link>
+            <a @click.prevent="logout()" title="Sair" class="logout">Sair <i class="fas fa-sign-out-alt"></i></a>
         </div>
-        <div class="col-md-8" ref="map"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="row d-flex align-items-center">
+                        <div class="col-md-12 text-center align-center mb-3">
+                            <img class="d-block mx-auto mb-4" src="../assets/logo.svg" alt="" width="72" height="72">    
+                            <h2>Localização <i class="fa fa-map" aria-hidden="true"></i></h2>
+                        </div>
+
+                        <div class="col-md-7">
+                            <gmap-autocomplete @place_changed="setPlace" placeholder="Adicionar localização" class="form-control"></gmap-autocomplete>
+                        </div>
+                        <div class="col-md-5">
+                            <button @click="addMarker" class="col-md-12 btn btn-primary d-block mx-auto">Adicionar rota</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 mt-3">
+                    <gmap-map :center="center" :zoom="12" class="maps">
+                        <gmap-marker :key="index" v-for="(m, index) in markers" :position="m.position" @click="center=m.position">
+                        </gmap-marker>
+                    </gmap-map>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
     export default {
+        name: "Places",
         data() {
             return {
-                lat: 0,
-                lng: 0,
-                type: "",
-                radius: "",
-                places: []
+                center: {
+                    lat: -8.05428,
+                    lng: -34.8813
+                },
+                markers: [],
+                places: [],
+                currentPlace: null
             };
         },
-        computed: {
-            coordinates() {
-                return `${this.lat}, ${this.lng}`;
-            }
+
+        mounted() {
+            this.geolocate();
         },
+
         methods: {
-            locatorButtonPressed() {
-                navigator.geolocation.getCurrentPosition(
-                position => {
-                    this.lat = position.coords.latitude;
-                    this.lng = position.coords.longitude;
-                },
-                error => {
-                    console.log("Error getting location");
+            setPlace(place) {
+                this.currentPlace = place;
+            },
+            addMarker() {
+                if (this.currentPlace) {
+                    const marker = {
+                        lat: this.currentPlace.geometry.location.lat(),
+                        lng: this.currentPlace.geometry.location.lng()
+                    };
+                    this.markers.push({
+                        position: marker
+                    });
+                    this.places.push(this.currentPlace);
+                    this.center = marker;
+                    this.currentPlace = null;
                 }
-                );
             },
-            findCloseBuyButtonPressed() {
-                const URL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
-                    this.lat
-                },${this.lng}&type=${this.type}&radius=${this.radius *
-                    1000}&key=[AIzaSyCOjooZA5PxZAQairoPi3p1Gyb8sddoF9A]`;
-                this.axios
-                    .get(URL)
-                    .then(response => {
-                        this.places = response.data.results;
-                        this.addLocationsToGoogleMaps();
-                    })
-                    .catch(error => {
-                        console.log(error.message);
-                    });
+            geolocate: function () {
+                navigator.geolocation.getCurrentPosition(position => {
+                    this.center = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                });
             },
-            addLocationsToGoogleMaps() {
-                var map = new google.maps.Map(this.$refs['map'], {
-                    zoom: 15,
-                    center: new google.maps.LatLng(this.lat, this.lng),
-                    mapTypeId: google.maps.MapTypeId.ROADMAP
-                });
-                
-                var infowindow = new google.maps.Infowindow();
-
-                this.places.forEach((place) => {
-                    const lat = place.geometry.location.lat;
-                    const lng = place.geometry.location.lng;
-                
-                    let marker = new  google.maps.Marker({
-                        position: new google.maps.LatLng(lat, lng),
-                        map: map
-                    }); 
-
-                    google.maps.event.addListener(marker, "click", () => {
-                        infowindow.setContent(`<div class="ui header">${place.name}</div><p>${place.vicinity}</p>`);
-                        
-                        infowindow.open(map, marker);
-                    });
-                });
+            logout () {
+                localStorage.removeItem('auth-token')
+                this.$router.push({ path: '/' })
             }
         }
-    }
+    };
 </script>
-
-<style lang="scss">
-
-</style>

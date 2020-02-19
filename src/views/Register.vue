@@ -1,5 +1,6 @@
 <template>
     <div class="page">  
+
       <div class="container">
           <div class="py-5 text-center">
               <img class="d-block mx-auto mb-4" src="../assets/logo.svg" alt="" width="72" height="72">
@@ -49,12 +50,16 @@ export default {
       })
         .then(function (response) {
           localStorage.setItem('auth-token', response.data.token)
-          router.push({ path: '/profile' })
+          router.push({ path: '/' })
         })
         .catch(function (error) {
           console.log('catch')
           console.log(error)
         })
+    },
+    logout () {
+      localStorage.removeItem('auth-token')
+      this.$router.push({ path: '/' })
     }
   }
 }

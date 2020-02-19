@@ -1,5 +1,12 @@
 <template>
     <div class="page">
+
+        <div id="nav" class="menu">
+            <router-link to="/places">Maps</router-link>
+            <router-link to="/profile">Perfil</router-link>
+            <a @click.prevent="logout()" title="Sair" class="logout">Sair <i class="fas fa-sign-out-alt"></i></a>
+        </div>
+
         <div class="container">
             <div class="py-5 text-center">
                 <img class="d-block mx-auto mb-4" src="../assets/logo.svg" alt="" width="72" height="72">
@@ -22,7 +29,7 @@
                             </div>
                         </div>
 
-                        <button class="btn btn-primary float-right" type="submit">Cadastrar</button>
+                        <button class="btn btn-primary float-right" type="submit">Salvar</button>
                     </form>
                 </div>
             </div>
@@ -51,7 +58,6 @@
         },
         methods: {
             submit() {
-                console.log(this.form)
                 const router = this.$router
                 this.axios.put('https://reqres.in/api/users/2', {
                     email: this.form.email,

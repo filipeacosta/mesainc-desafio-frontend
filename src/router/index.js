@@ -22,7 +22,11 @@ const routes = [
   {
     path: '/editar',
     name: 'Edit',
-    component: () => import(/* webpackChunkName: "editar profile" */ '../views/Edit')
+    component: () => import(/* webpackChunkName: "editar profile" */ '../views/Edit'),
+    beforeEnter: (to, from, next) => {
+      if (!localStorage.getItem('auth-token')) next('/')
+      else next()
+    }
   },
   {
     path: '/cadastrar',
@@ -33,6 +37,10 @@ const routes = [
     path: '/places',
     name: 'Places',
     component: () => import(/* webpackChunkName: "places" */ '../views/Places'),
+    beforeEnter: (to, from, next) => {
+      if (!localStorage.getItem('auth-token')) next('/')
+      else next()
+    }
   }
 ]
 

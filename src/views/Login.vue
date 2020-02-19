@@ -31,8 +31,6 @@ export default {
   }),
   methods: {
     submit () {
-      console.log(this.form)
-      // ativar loader
       const router = this.$router
       this.axios.post('https://reqres.in/api/login', {
         email: this.form.email,
@@ -40,7 +38,7 @@ export default {
       })
         .then(function (response) {
           localStorage.setItem('auth-token', response.data.token)
-          router.push({ path: '/profile' })
+          router.push({ path: '/places' })
         })
         .catch(function (error) {
           
